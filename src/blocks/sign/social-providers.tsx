@@ -1,9 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { signIn } from "@/core/auth/client";
 import { useRouter } from "next/navigation";
 import { Button as ButtonType } from "@/types/blocks/common";
 import { RiGithubFill, RiGoogleFill } from "react-icons/ri";
+import { useAppContext } from "@/contexts/app";
 
 export function SocialProviders({
   callbackURL,
@@ -15,6 +18,8 @@ export function SocialProviders({
   setLoading: (loading: boolean) => void;
 }) {
   const router = useRouter();
+
+  const { setIsShowSignModal } = useAppContext();
 
   const handleSignIn = async ({ provider }: { provider: string }) => {
     await signIn.social(
@@ -28,6 +33,7 @@ export function SocialProviders({
         },
         onResponse: (ctx) => {
           setLoading(false);
+          setIsShowSignModal(false);
         },
         onSuccess: (ctx) => {
           router.push(callbackURL || "/");

@@ -55,7 +55,17 @@ export function SignUser({
         <DropdownMenuContent>
           <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut()}>
+          <DropdownMenuItem
+            onClick={() =>
+              signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    router.push("/");
+                  },
+                },
+              })
+            }
+          >
             <span>Sign Out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

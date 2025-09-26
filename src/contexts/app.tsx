@@ -45,10 +45,12 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   }, [theme, setTheme]);
 
   useEffect(() => {
-    if (session?.user) {
+    if (session && session.user) {
       setUser(session.user as User);
+    } else {
+      setUser(null);
     }
-  }, [session?.user]);
+  }, [session]);
 
   useEffect(() => {
     setIsCheckSign(isPending);
