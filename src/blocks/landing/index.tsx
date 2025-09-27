@@ -1,10 +1,10 @@
 export * from "./header";
-export * from "./header-one";
 
 export * from "./footer";
 
 export * from "./hero";
 export * from "./hero-one";
+export * from "./hero-two";
 
 export * from "./features";
 export * from "./features-list";

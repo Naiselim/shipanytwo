@@ -10,10 +10,14 @@ export default async function PricingPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("landing");
+  const tt = await getTranslations("pricing");
 
   return (
     <>
-      <Pricing />
+      <Pricing
+        pricing={tt.raw("default")}
+        srOnlyTitle={tt.raw("default.title")}
+      />
       <FAQ faq={t.raw("faq")} />
       <Testimonials testimonials={t.raw("testimonials")} />
     </>

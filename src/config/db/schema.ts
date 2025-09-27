@@ -4,6 +4,7 @@ import {
   timestamp,
   boolean,
   integer,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -115,4 +116,69 @@ export const post = pgTable("post", {
     .notNull(),
   deletedAt: timestamp("deleted_at"),
   sort: integer("sort").default(0).notNull(),
+});
+
+export const order = pgTable("order", {
+  id: text("id").primaryKey(),
+  orderNo: text("order_no").unique().notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  userEmail: text("user_email"), // checkout user email
+  status: text("status").notNull(), // created, paid, failed
+  amount: integer("amount").notNull(), // checkout amount in cents
+  currency: text("currency").notNull(), // checkout currency
+  productId: text("product_id"),
+  paymentType: text("payment_type"), // one_time, subscription
+  paymentInterval: text("payment_interval"), // day, week, month, year
+  paymentProvider: text("payment_provider").notNull(),
+  paymentSessionId: text("payment_session_id"),
+  checkoutInfo: text("checkout_info").notNull(), // checkout request info
+  checkoutResult: text("checkout_result"), // checkout result
+  paymentResult: text("payment_result"), // payment result
+  discountCode: text("discount_code"), // discount code
+  discountAmount: integer("discount_amount"), // discount amount in cents
+  discountCurrency: text("discount_currency"), // discount currency
+  paymentEmail: text("payment_email"), // actual payment email
+  paymentAmount: integer("payment_amount"), // actual payment amount
+  paymentCurrency: text("payment_currency"), // actual payment currency
+  paidAt: timestamp("paid_at"), // paid at
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  deletedAt: timestamp("deleted_at"),
+  description: text("description"), // order description
+  productName: text("product_name"), // product name
+  subscriptionId: text("subscription_id"), // subscription id
+  subscriptionResult: text("subscription_result"), // subscription result
+  checkoutUrl: text("checkout_url"), // checkout url
+  callbackUrl: text("callback_url"), // callback url, after handle callback
+});
+
+export const subscription = pgTable("subscription", {
+  id: text("id").primaryKey(),
+  subscriptionNo: text("subscription_no").unique().notNull(), // subscription no
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  userEmail: text("user_email"), // subscription user email
+  status: text("status").notNull(), // subscription status
+  paymentProvider: text("payment_provider").notNull(),
+  subscriptionId: text("subscription_id").notNull(), // provider subscription id
+  subscriptionResult: text("subscription_result"), // provider subscription result
+  productId: text("product_id"), // product id
+  description: text("description"), // subscription description
+  amount: integer("amount"), // subscription amount
+  currency: text("currency"), // subscription currency
+  interval: text("interval"), // subscription interval, day, week, month, year
+  intervalCount: integer("interval_count"), // subscription interval count
+  trialPeriodDays: integer("trial_period_days"), // subscription trial period days
+  currentPeriodStart: timestamp("current_period_start"), // subscription current period start
+  currentPeriodEnd: timestamp("current_period_end"), // subscription current period end
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  deletedAt: timestamp("deleted_at"),
 });

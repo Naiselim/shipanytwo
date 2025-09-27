@@ -1,8 +1,8 @@
-import type {
+import {
   PaymentProvider,
   PaymentConfigs,
   PaymentRequest,
-  PaymentResult,
+  PaymentStatus,
   PaymentSession,
   PaymentWebhookResult,
 } from ".";
@@ -35,15 +35,17 @@ export class CreemProvider implements PaymentProvider {
         : "https://test-api.creem.io";
   }
 
-  async createPayment(request: PaymentRequest): Promise<PaymentResult> {
+  // create payment
+  async createPayment(request: PaymentRequest): Promise<PaymentSession> {
     try {
       if (!request.productId) {
         throw new Error("productId is required");
       }
 
+      // build payment payload
       const payload: any = {
         product_id: request.productId,
-        request_id: request.requestId,
+        request_id: request.requestId || undefined,
         units: 1,
         discount_code: request.discount
           ? {
@@ -60,8 +62,8 @@ export class CreemProvider implements PaymentProvider {
           ? request.customFields.map((customField) => ({
               type: customField.type,
               key: customField.name,
-              label: customField.title,
-              optional: customField.isRequired,
+              label: customField.label,
+              optional: !customField.isRequired,
               text: customField.metadata,
             }))
           : undefined,
@@ -71,90 +73,93 @@ export class CreemProvider implements PaymentProvider {
 
       const result = await this.makeRequest("/v1/checkouts", "POST", payload);
 
+      // create payment failed
       if (result.error) {
-        return {
-          success: false,
-          error: result.error.message || "Creem payment creation failed",
-          provider: this.name,
-        };
+        throw new Error(result.error.message || "create payment failed");
       }
 
+      // create payment success
       return {
         success: true,
-        session: {
-          id: result.id,
-          url: result.checkout_url,
-          status: this.mapCreemStatus(result.status),
-          price: request.price,
-          customer: request.customer,
-          metadata: request.metadata,
-        },
         provider: this.name,
-        providerResult: result,
+        checkoutParams: payload,
+        checkoutInfo: {
+          sessionId: result.id,
+          checkoutUrl: result.checkout_url,
+        },
+        checkoutResult: result,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : "create payment failed",
         provider: this.name,
       };
     }
   }
 
-  // get payment session by session id
+  // get payment by session id
   // @docs https://docs.creem.io/api-reference/endpoint/get-checkout
-  async getPaymentSession({
+  async getPayment({
     sessionId,
-    searchParams,
   }: {
-    sessionId?: string;
-    searchParams?: URLSearchParams;
-  }): Promise<PaymentSession | null> {
+    sessionId: string;
+  }): Promise<PaymentSession> {
     try {
-      if (!sessionId && !searchParams) {
-        throw new Error("sessionId or searchParams is required");
-      }
-
-      if (!sessionId) {
-        sessionId = searchParams?.get("checkout_id") || "";
-      }
-
       if (!sessionId) {
         throw new Error("sessionId is required");
       }
 
+      // retrieve payment
       const result = await this.makeRequest(
         `/v1/checkouts?checkout_id=${sessionId}`,
         "GET"
       );
 
       if (result.error) {
-        return null;
+        throw new Error(result.error.message || "get payment failed");
       }
 
+      // get payment success
       return {
-        id: result.id,
-        url: result.checkout_url,
-        status: this.mapCreemStatus(result.status),
-        metadata: result.metadata,
+        success: true,
+        provider: this.name,
+        paymentStatus: this.mapCreemStatus(result.status),
+        paymentInfo: {
+          discountCode: "",
+          discountAmount: undefined,
+          discountCurrency: undefined,
+          paymentAmount: result.amount || 0,
+          paymentCurrency: result.currency,
+          paymentEmail: result.customer_email,
+          paidAt: result.created ? new Date(result.created * 1000) : undefined,
+        },
+        paymentResult: result,
       };
     } catch (error) {
-      console.error("Error retrieving Creem session:", error);
-      return null;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "get payment failed",
+        provider: this.name,
+      };
     }
   }
 
-  async handleWebhook(
-    rawBody: string | Buffer,
-    signature?: string,
-    _headers?: Record<string, string>
-  ): Promise<PaymentWebhookResult> {
+  async handleWebhook({
+    rawBody,
+    signature,
+    headers,
+  }: {
+    rawBody: string | Buffer;
+    signature?: string;
+    headers?: Record<string, string>;
+  }): Promise<PaymentWebhookResult> {
     try {
       if (!this.configs.webhookSecret) {
-        throw new Error("Webhook secret not configured");
+        throw new Error("webhookSecret not configured");
       }
 
-      // Parse the webhook payload
+      // parse the webhook payload
       const payload =
         typeof rawBody === "string"
           ? JSON.parse(rawBody)
@@ -213,22 +218,22 @@ export class CreemProvider implements PaymentProvider {
     return await response.json();
   }
 
-  private mapCreemStatus(status: string): PaymentSession["status"] {
+  private mapCreemStatus(status: string): PaymentStatus {
     switch (status) {
       case "pending":
-        return "pending";
+        return PaymentStatus.PROCESSING;
       case "processing":
-        return "processing";
+        return PaymentStatus.PROCESSING;
       case "completed":
       case "paid":
-        return "completed";
+        return PaymentStatus.SUCCESS;
       case "failed":
-        return "failed";
+        return PaymentStatus.FAILED;
       case "cancelled":
       case "expired":
-        return "cancelled";
+        return PaymentStatus.CANCELLED;
       default:
-        return "pending";
+        throw new Error(`Unknown Creem status: ${status}`);
     }
   }
 }

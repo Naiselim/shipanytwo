@@ -1,0 +1,30 @@
+CREATE TABLE "order" (
+	"id" text PRIMARY KEY NOT NULL,
+	"order_no" text NOT NULL,
+	"user_id" text NOT NULL,
+	"user_email" text,
+	"status" text NOT NULL,
+	"amount" integer NOT NULL,
+	"currency" text NOT NULL,
+	"product_id" text,
+	"payment_type" text,
+	"payment_interval" text,
+	"payment_provider" text NOT NULL,
+	"payment_session_id" text,
+	"checkout_info" text NOT NULL,
+	"checkout_result" text,
+	"payment_result" text,
+	"discount_code" text,
+	"discount_amount" integer,
+	"discount_currency" text,
+	"payment_email" text,
+	"payment_amount" integer,
+	"payment_currency" text,
+	"paid_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	"deleted_at" timestamp,
+	CONSTRAINT "order_order_no_unique" UNIQUE("order_no")
+);
+--> statement-breakpoint
+ALTER TABLE "order" ADD CONSTRAINT "order_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

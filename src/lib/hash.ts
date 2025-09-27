@@ -26,9 +26,17 @@ export function getNonceStr(length: number): string {
   return result;
 }
 
+/**
+ * get snow id
+ */
 export function getSnowId(): string {
-  const gen = new SnowflakeIdv1({ workerId: 1 });
+  const workerId = Math.floor(Math.random() * 1024);
+  const gen = new SnowflakeIdv1({ workerId });
   const snowId = gen.NextId();
 
-  return snowId.toString();
+  const suffix = Math.floor(Math.random() * 100)
+    .toString()
+    .padStart(2, "0");
+
+  return `${snowId}${suffix}`;
 }

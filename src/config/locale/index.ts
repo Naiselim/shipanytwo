@@ -19,6 +19,7 @@ export const localeMessagesPaths = [
   "demo",
   "showcases",
   "blog",
+  "pricing",
   "admin/sidebar",
   "admin/user",
 ];

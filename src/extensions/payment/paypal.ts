@@ -1,11 +1,10 @@
-import type {
+import {
   PaymentProvider,
   PaymentConfigs,
   PaymentRequest,
-  PaymentResult,
   PaymentSession,
   PaymentWebhookResult,
-  PaymentProduct,
+  PaymentStatus,
 } from ".";
 
 /**
@@ -39,7 +38,8 @@ export class PayPalProvider implements PaymentProvider {
         : "https://api-m.sandbox.paypal.com";
   }
 
-  async createPayment(request: PaymentRequest): Promise<PaymentResult> {
+  // create payment
+  async createPayment(request: PaymentRequest): Promise<PaymentSession> {
     if (request.type === "subscription") {
       return this.createSubscriptionPayment(request);
     } else {
@@ -47,7 +47,8 @@ export class PayPalProvider implements PaymentProvider {
     }
   }
 
-  async createOneTimePayment(request: PaymentRequest): Promise<PaymentResult> {
+  // create one time payment
+  async createOneTimePayment(request: PaymentRequest): Promise<PaymentSession> {
     try {
       await this.ensureAccessToken();
 
@@ -55,15 +56,7 @@ export class PayPalProvider implements PaymentProvider {
         throw new Error("price is required");
       }
 
-      const items = request.products?.map((product) => ({
-        name: product.name,
-        description: product.description,
-        unit_amount: {
-          currency_code: product.price.currency.toUpperCase(),
-          value: (product.price.amount / 100).toFixed(2), // unit: dollars
-        },
-        quantity: "1",
-      })) || [
+      const items = [
         {
           name: request.description || "Payment",
           unit_amount: {
@@ -123,16 +116,23 @@ export class PayPalProvider implements PaymentProvider {
 
       return {
         success: true,
-        session: {
-          id: result.id,
-          url: approvalUrl,
-          status: this.mapPayPalStatus(result.status),
-          price: request.price,
-          customer: request.customer,
-          metadata: request.metadata,
-        },
         provider: this.name,
-        providerResult: result,
+        checkoutParams: payload,
+        checkoutInfo: {
+          sessionId: result.id,
+          checkoutUrl: approvalUrl,
+        },
+        checkoutResult: result,
+        paymentStatus: this.mapPayPalStatus(result.status),
+        paymentInfo: {
+          discountCode: "",
+          discountAmount: undefined,
+          discountCurrency: undefined,
+          paymentAmount: totalAmount,
+          paymentCurrency: request.price.currency.toUpperCase(),
+          paymentEmail: request.customer?.email,
+          paidAt: new Date(),
+        },
       };
     } catch (error) {
       return {
@@ -145,7 +145,7 @@ export class PayPalProvider implements PaymentProvider {
 
   async createSubscriptionPayment(
     request: PaymentRequest
-  ): Promise<PaymentResult> {
+  ): Promise<PaymentSession> {
     try {
       await this.ensureAccessToken();
 
@@ -192,8 +192,8 @@ export class PayPalProvider implements PaymentProvider {
             total_cycles: 0, // Infinite
             pricing_scheme: {
               fixed_price: {
-                value: request.plan.price.amount.toFixed(2),
-                currency_code: request.plan.price.currency.toUpperCase(),
+                value: request.price?.amount.toFixed(2),
+                currency_code: request.price?.currency.toUpperCase(),
               },
             },
           },
@@ -206,7 +206,7 @@ export class PayPalProvider implements PaymentProvider {
       };
 
       // Add trial period if specified
-      if (request.trialPeriodDays || request.plan.trialPeriodDays) {
+      if (request.plan?.trialPeriodDays) {
         planPayload.billing_cycles.unshift({
           frequency: {
             interval_unit: "DAY",
@@ -214,12 +214,11 @@ export class PayPalProvider implements PaymentProvider {
           },
           tenure_type: "TRIAL",
           sequence: 0,
-          total_cycles:
-            request.trialPeriodDays || request.plan.trialPeriodDays || 0,
+          total_cycles: request.plan?.trialPeriodDays || 0,
           pricing_scheme: {
             fixed_price: {
               value: "0.00",
-              currency_code: request.plan.price.currency.toUpperCase(),
+              currency_code: request.price?.currency.toUpperCase(),
             },
           },
         });
@@ -287,15 +286,13 @@ export class PayPalProvider implements PaymentProvider {
 
       return {
         success: true,
-        session: {
-          id: subscriptionResponse.id,
-          url: approvalUrl,
-          status: this.mapPayPalStatus(subscriptionResponse.status),
-          price: request.plan.price,
-          customer: request.customer,
-          metadata: request.metadata,
-        },
         provider: this.name,
+        checkoutParams: subscriptionPayload,
+        checkoutInfo: {
+          sessionId: subscriptionResponse.id,
+          checkoutUrl: approvalUrl,
+        },
+        checkoutResult: subscriptionResponse,
       };
     } catch (error) {
       return {
@@ -306,20 +303,14 @@ export class PayPalProvider implements PaymentProvider {
     }
   }
 
-  async getPaymentSession({
+  async getPayment({
     sessionId,
-    searchParams,
   }: {
     sessionId?: string;
-    searchParams?: URLSearchParams;
-  }): Promise<PaymentSession | null> {
+  }): Promise<PaymentSession> {
     try {
-      if (!sessionId && !searchParams) {
-        throw new Error("sessionId or searchParams is required");
-      }
-
       if (!sessionId) {
-        sessionId = searchParams?.get("token") || "";
+        throw new Error("sessionId is required");
       }
 
       await this.ensureAccessToken();
@@ -339,27 +330,45 @@ export class PayPalProvider implements PaymentProvider {
       }
 
       if (result.error) {
-        return null;
+        throw new Error(result.error.message || "get payment failed");
       }
 
       return {
-        id: result.id,
-        status: this.mapPayPalStatus(result.status),
+        success: true,
+        provider: this.name,
+        paymentStatus: this.mapPayPalStatus(result.status),
+        paymentInfo: {
+          discountCode: "",
+          discountAmount: undefined,
+          discountCurrency: undefined,
+          paymentAmount: result.amount,
+          paymentCurrency: result.currency,
+          paymentEmail: result.customer_email,
+          paidAt: new Date(),
+        },
+        paymentResult: result,
       };
     } catch (error) {
-      console.error("Error retrieving PayPal session:", error);
-      return null;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "get payment failed",
+        provider: this.name,
+      };
     }
   }
 
-  async handleWebhook(
-    rawBody: string | Buffer,
-    _signature?: string,
-    headers?: Record<string, string>
-  ): Promise<PaymentWebhookResult> {
+  async handleWebhook({
+    rawBody,
+    signature,
+    headers,
+  }: {
+    rawBody: string | Buffer;
+    signature?: string;
+    headers?: Record<string, string>;
+  }): Promise<PaymentWebhookResult> {
     try {
       if (!this.configs.webhookSecret) {
-        throw new Error("Webhook secret not configured");
+        throw new Error("webhookSecret not configured");
       }
 
       const payload =
@@ -367,7 +376,7 @@ export class PayPalProvider implements PaymentProvider {
           ? JSON.parse(rawBody)
           : JSON.parse(rawBody.toString());
 
-      // Verify webhook with PayPal (simplified verification)
+      // verify webhook with PayPal (simplified verification)
       await this.ensureAccessToken();
 
       const verifyPayload = {
@@ -470,22 +479,22 @@ export class PayPalProvider implements PaymentProvider {
     return await response.json();
   }
 
-  private mapPayPalStatus(status: string): PaymentSession["status"] {
+  private mapPayPalStatus(status: string): PaymentStatus {
     switch (status) {
       case "CREATED":
       case "SAVED":
       case "APPROVED":
-        return "pending";
+        return PaymentStatus.PROCESSING;
       case "COMPLETED":
       case "ACTIVE":
-        return "completed";
+        return PaymentStatus.SUCCESS;
       case "CANCELLED":
       case "EXPIRED":
-        return "cancelled";
+        return PaymentStatus.CANCELLED;
       case "SUSPENDED":
-        return "failed";
+        return PaymentStatus.FAILED;
       default:
-        return "pending";
+        return PaymentStatus.PROCESSING;
     }
   }
 }
