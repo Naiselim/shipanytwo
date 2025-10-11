@@ -125,8 +125,8 @@ export interface SubscriptionInfo {
   description?: string;
   amount?: number;
   currency?: string;
-  interval: PaymentInterval;
-  intervalCount: number;
+  interval?: PaymentInterval;
+  intervalCount?: number;
   trialPeriodDays?: number;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;

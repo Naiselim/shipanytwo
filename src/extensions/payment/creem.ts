@@ -5,6 +5,7 @@ import {
   PaymentStatus,
   PaymentSession,
   PaymentWebhookResult,
+  PaymentInterval,
 } from ".";
 
 /**
@@ -111,31 +112,69 @@ export class CreemProvider implements PaymentProvider {
       }
 
       // retrieve payment
-      const result = await this.makeRequest(
+      const session = await this.makeRequest(
         `/v1/checkouts?checkout_id=${sessionId}`,
         "GET"
       );
 
-      if (result.error) {
-        throw new Error(result.error.message || "get payment failed");
+      if (!session.id || !session.order) {
+        throw new Error(session.error || "get payment failed");
       }
 
-      // get payment success
-      return {
+      let subscription: any | undefined = undefined;
+      let billingUrl = "";
+
+      if (session.subscription) {
+        subscription = session.subscription;
+      }
+
+      const result: PaymentSession = {
         success: true,
         provider: this.name,
-        paymentStatus: this.mapCreemStatus(result.status),
+        paymentStatus: this.mapCreemStatus(session),
         paymentInfo: {
           discountCode: "",
           discountAmount: undefined,
           discountCurrency: undefined,
-          paymentAmount: result.amount || 0,
-          paymentCurrency: result.currency,
-          paymentEmail: result.customer_email,
-          paidAt: result.created ? new Date(result.created * 1000) : undefined,
+          paymentAmount: session.order.amount_paid || 0,
+          paymentCurrency: session.order.currency || "",
+          paymentEmail: session.customer?.email || undefined,
+          paidAt: session.order.updated_at
+            ? new Date(session.order.updated_at)
+            : undefined,
         },
-        paymentResult: result,
+        paymentResult: session,
       };
+
+      if (subscription) {
+        result.subscriptionId = subscription.id;
+
+        result.subscriptionInfo = {
+          subscriptionId: subscription.id,
+          productId: session.product?.id,
+          planId: "",
+          description: session.product?.description || "",
+          amount: session.order.amount_paid || 0,
+          currency: session.order.currency,
+          currentPeriodStart: new Date(subscription.current_period_start_date),
+          currentPeriodEnd: new Date(subscription.current_period_end_date),
+          interval:
+            session.product?.billing_period === "every-month"
+              ? PaymentInterval.MONTH
+              : subscription.product?.billing_period === "every-year"
+              ? PaymentInterval.YEAR
+              : subscription.product?.billing_period === "every-week"
+              ? PaymentInterval.WEEK
+              : subscription.product?.billing_period === "every-day"
+              ? PaymentInterval.DAY
+              : undefined,
+          intervalCount: 1,
+          billingUrl: billingUrl,
+        };
+        result.subscriptionResult = subscription;
+      }
+
+      return result;
     } catch (error) {
       return {
         success: false,
@@ -218,7 +257,9 @@ export class CreemProvider implements PaymentProvider {
     return await response.json();
   }
 
-  private mapCreemStatus(status: string): PaymentStatus {
+  private mapCreemStatus(session: any): PaymentStatus {
+    const status = session.status;
+
     switch (status) {
       case "pending":
         return PaymentStatus.PROCESSING;

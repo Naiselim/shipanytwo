@@ -56,6 +56,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "starter",
+        "payment_product_id": "prod_7ehwYVBKhykl9mAFBcPibQ",
         "product_name": "ShipAny Boilerplate Starter",
         "credits": 100,
         "valid_days": 30,
@@ -91,6 +92,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "standard",
+        "payment_product_id": "prod_7hILT78TgVnHTOmHHcMZgv",
         "product_name": "ShipAny Boilerplate Standard",
         "credits": 200,
         "valid_days": 90,
@@ -124,6 +126,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "premium",
+        "payment_product_id": "prod_6kfJtbWBnnqVdzEbjPaoTR",
         "product_name": "ShipAny Boilerplate Premium",
         "credits": 300,
         "valid_days": 365,
@@ -191,6 +194,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "standard-monthly",
+        "payment_product_id": "prod_1r0U95BfJ5LTIo4DdxDmC2",
         "product_name": "ShipAny Boilerplate Standard Monthly",
         "credits": 200,
         "valid_days": 30,
@@ -325,6 +329,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "premium-yearly",
+        "payment_product_id": "prod_7JiQhXqON6JayHXjtx5rXJ",
         "product_name": "ShipAny Boilerplate Premium Annually",
         "credits": 3600,
         "valid_days": 365,

@@ -23,6 +23,7 @@ export interface PricingItem {
   is_featured?: boolean;
   interval: "month" | "year" | "one-time";
   product_id: string;
+  payment_product_id?: string;
   product_name?: string;
   amount: number;
   cn_amount?: number;

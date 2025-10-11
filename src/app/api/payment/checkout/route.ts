@@ -64,8 +64,7 @@ export async function POST(req: Request) {
 
     const orderNo = getSnowId();
 
-    // todo: get payment product
-    const paymentProductId = "";
+    const paymentProductId = pricingItem.payment_product_id || "";
 
     // build checkout price
     const checkoutPrice: PaymentPrice = {
@@ -99,7 +98,7 @@ export async function POST(req: Request) {
 
     if (paymentProductId) {
       // checkout with predefined product
-      checkoutInfo.productId = pricingItem.product_id;
+      checkoutInfo.productId = paymentProductId;
     } else {
       checkoutInfo.price = checkoutPrice;
 
@@ -117,7 +116,10 @@ export async function POST(req: Request) {
 
     const currentTime = new Date();
 
-    const callbackUrl = `${envConfigs.app_url}/settings/billing`;
+    const callbackUrl =
+      paymentType === PaymentType.SUBSCRIPTION
+        ? `${envConfigs.app_url}/settings/billing`
+        : `${envConfigs.app_url}/settings/payments`;
 
     // build order info
     const order: NewOrder = {
@@ -140,6 +142,7 @@ export async function POST(req: Request) {
       creditsAmount: pricingItem.credits,
       creditsValidDays: pricingItem.valid_days,
       planName: pricingItem.plan_name || "",
+      paymentProductId: paymentProductId,
     };
 
     // create order

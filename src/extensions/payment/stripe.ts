@@ -161,6 +161,10 @@ export class StripeProvider implements PaymentProvider {
 
       const session = await this.client.checkout.sessions.retrieve(sessionId);
 
+      if (!session.id || !session.amount_total || !session.currency) {
+        throw new Error("get payment failed");
+      }
+
       let subscription: Stripe.Response<Stripe.Subscription> | undefined =
         undefined;
       let billingUrl = "";
