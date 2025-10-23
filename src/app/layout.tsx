@@ -96,7 +96,7 @@ export default async function RootLayout({
         {/* inject analytics head scripts */}
         {analyticsHeadScripts}
       </head>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="overflow-x-hidden">
         <NextTopLoader
           color="#6466F1"
           initialPosition={0.08}

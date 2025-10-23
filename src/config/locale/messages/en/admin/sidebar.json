@@ -12,57 +12,76 @@
   },
   "main_navs": [
     {
-      "title": "RBAC",
+      "title": "System",
       "items": [
         {
-          "title": "Users",
-          "url": "/admin/users",
-          "icon": "User"
+          "title": "Users & Permissions",
+          "icon": "User",
+          "is_expand": true,
+          "children": [
+            {
+              "title": "Users",
+              "url": "/admin/users",
+              "icon": "User"
+            },
+            {
+              "title": "Roles",
+              "url": "/admin/roles",
+              "icon": "Users"
+            },
+            {
+              "title": "Permissions",
+              "url": "/admin/permissions",
+              "icon": "ShieldCheck"
+            }
+          ]
         },
         {
-          "title": "Roles",
-          "url": "/admin/roles",
-          "icon": "Users"
-        },
-        {
-          "title": "Permissions",
-          "url": "/admin/permissions",
-          "icon": "ShieldCheck"
-        }
-      ]
-    },
-    {
-      "title": "CMS",
-      "items": [
-        {
-          "title": "Categories",
-          "icon": "Folder",
-          "url": "/admin/categories"
-        },
-        {
-          "title": "Posts",
+          "title": "Pages & Content",
           "icon": "FileText",
-          "url": "/admin/posts"
+          "children": [
+            {
+              "title": "Categories",
+              "icon": "Folder",
+              "url": "/admin/categories"
+            },
+            {
+              "title": "Posts",
+              "icon": "FileText",
+              "url": "/admin/posts"
+            }
+          ]
+        },
+        {
+          "title": "Payments & Credits",
+          "icon": "DollarSign",
+          "children": [
+            {
+              "title": "Payments",
+              "url": "/admin/payments",
+              "icon": "DollarSign"
+            },
+            {
+              "title": "Subscriptions",
+              "url": "/admin/subscriptions",
+              "icon": "CreditCard"
+            },
+            {
+              "title": "Credits",
+              "url": "/admin/credits",
+              "icon": "Coins"
+            }
+          ]
         }
       ]
     },
     {
-      "title": "Payments & Credits",
+      "title": "Business",
       "items": [
         {
-          "title": "Payments",
-          "url": "/admin/payments",
-          "icon": "DollarSign"
-        },
-        {
-          "title": "Subscriptions",
-          "url": "/admin/subscriptions",
-          "icon": "CreditCard"
-        },
-        {
-          "title": "Credits",
-          "url": "/admin/credits",
-          "icon": "Coins"
+          "title": "AI Tasks",
+          "url": "/admin/ai-tasks",
+          "icon": "Brain"
         }
       ]
     }
@@ -119,13 +138,13 @@
         },
         {
           "title": "Discord",
-          "url": "https://discord.gg/x9usYqTaaj",
+          "url": "https://discord.gg/HQNnrzjZQS",
           "icon": "RiDiscordFill",
           "target": "_blank"
         },
         {
           "title": "Email",
-          "url": "mailto:support@shipany.ai",
+          "url": "mailto:support@xxx.ai",
           "icon": "Mail",
           "target": "_blank"
         }

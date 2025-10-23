@@ -221,6 +221,29 @@ const defaultPermissions = [
     description: 'Delete permissions',
   },
 
+  // AI Tasks management
+  {
+    code: 'admin.ai-tasks.read',
+    resource: 'ai-tasks',
+    action: 'read',
+    title: 'Read AI Tasks',
+    description: 'View AI task list and details',
+  },
+  {
+    code: 'admin.ai-tasks.write',
+    resource: 'ai-tasks',
+    action: 'write',
+    title: 'Write AI Tasks',
+    description: 'Create and update AI tasks',
+  },
+  {
+    code: 'admin.ai-tasks.delete',
+    resource: 'ai-tasks',
+    action: 'delete',
+    title: 'Delete AI Tasks',
+    description: 'Delete AI tasks',
+  },
+
   // Wildcard permission for super admin
   {
     code: '*',
@@ -257,6 +280,7 @@ const defaultRoles = [
       'admin.credits.*',
       'admin.apikeys.*',
       'admin.settings.read',
+      'admin.ai-tasks.*',
     ],
   },
   {

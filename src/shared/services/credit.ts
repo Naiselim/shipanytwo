@@ -148,11 +148,13 @@ export async function consumeCredits({
   credits,
   scene,
   description,
+  metadata,
 }: {
   userId: string;
   credits: number; // credits to consume
   scene?: string;
   description?: string;
+  metadata?: string;
 }) {
   const currentTime = new Date();
 
@@ -276,6 +278,7 @@ export async function consumeCredits({
       description: description,
       credits: -credits,
       consumedDetail: JSON.stringify(consumedItems),
+      metadata: metadata,
     };
     await tx.insert(credit).values(consumedCredit);
 

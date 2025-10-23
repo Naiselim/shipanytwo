@@ -57,11 +57,21 @@ export class KieProvider implements AIProvider {
       callBackUrl: params.callbackUrl,
     };
 
-    if (params.options) {
-      payload = {
-        ...payload,
-        ...params.options,
-      };
+    if (params.options && params.options.customMode) {
+      // custom mode
+      payload.customMode = true;
+      payload.title = params.options.title;
+      payload.style = params.options.style;
+      payload.instrumental = params.options.instrumental;
+      if (!params.options.instrumental) {
+        // not instrumental, lyrics is used as prompt
+        payload.prompt = params.options.lyrics;
+      }
+    } else {
+      // not custom mode
+      payload.customMode = false;
+      payload.prompt = params.prompt;
+      payload.instrumental = params.options?.instrumental;
     }
 
     // const params = {

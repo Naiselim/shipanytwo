@@ -12,57 +12,76 @@
   },
   "main_navs": [
     {
-      "title": "用户与权限",
+      "title": "系统",
       "items": [
         {
-          "title": "用户",
-          "url": "/admin/users",
-          "icon": "User"
+          "title": "用户与权限",
+          "icon": "User",
+          "is_expand": true,
+          "children": [
+            {
+              "title": "用户",
+              "url": "/admin/users",
+              "icon": "User"
+            },
+            {
+              "title": "角色",
+              "url": "/admin/roles",
+              "icon": "Users"
+            },
+            {
+              "title": "权限",
+              "url": "/admin/permissions",
+              "icon": "ShieldCheck"
+            }
+          ]
         },
         {
-          "title": "角色",
-          "url": "/admin/roles",
-          "icon": "Users"
-        },
-        {
-          "title": "权限",
-          "url": "/admin/permissions",
-          "icon": "ShieldCheck"
-        }
-      ]
-    },
-    {
-      "title": "页面与内容",
-      "items": [
-        {
-          "title": "分类",
-          "icon": "Folder",
-          "url": "/admin/categories"
-        },
-        {
-          "title": "文章",
+          "title": "页面与内容",
           "icon": "FileText",
-          "url": "/admin/posts"
+          "children": [
+            {
+              "title": "分类",
+              "icon": "Folder",
+              "url": "/admin/categories"
+            },
+            {
+              "title": "文章",
+              "icon": "FileText",
+              "url": "/admin/posts"
+            }
+          ]
+        },
+        {
+          "title": "支付与积分",
+          "icon": "DollarSign",
+          "children": [
+            {
+              "title": "支付",
+              "url": "/admin/payments",
+              "icon": "DollarSign"
+            },
+            {
+              "title": "订阅",
+              "url": "/admin/subscriptions",
+              "icon": "CreditCard"
+            },
+            {
+              "title": "积分",
+              "url": "/admin/credits",
+              "icon": "Coins"
+            }
+          ]
         }
       ]
     },
     {
-      "title": "支付与积分",
+      "title": "业务",
       "items": [
         {
-          "title": "支付",
-          "url": "/admin/payments",
-          "icon": "DollarSign"
-        },
-        {
-          "title": "订阅",
-          "url": "/admin/subscriptions",
-          "icon": "CreditCard"
-        },
-        {
-          "title": "积分",
-          "url": "/admin/credits",
-          "icon": "Coins"
+          "title": "AI任务",
+          "url": "/admin/ai-tasks",
+          "icon": "Brain"
         }
       ]
     }
@@ -119,13 +138,13 @@
         },
         {
           "title": "Discord",
-          "url": "https://discord.gg/x9usYqTaaj",
+          "url": "https://discord.gg/HQNnrzjZQS",
           "icon": "RiDiscordFill",
           "target": "_blank"
         },
         {
           "title": "邮箱",
-          "url": "mailto:support@shipany.ai",
+          "url": "mailto:support@xxx.ai",
           "icon": "Mail",
           "target": "_blank"
         }

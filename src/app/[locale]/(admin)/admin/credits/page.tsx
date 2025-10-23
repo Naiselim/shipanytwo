@@ -110,6 +110,12 @@ export default async function CreditsPage({
         placeholder: '-',
         metadata: { format: 'YYYY-MM-DD HH:mm:ss' },
       },
+      {
+        name: 'metadata',
+        title: t('fields.metadata'),
+        type: 'json_preview',
+        placeholder: '-',
+      },
     ],
     data: credits,
     pagination: {

@@ -27,6 +27,19 @@
     "no_song_generated": "No Song Generated",
     "downloading": "Downloading...",
     "download_success": "Download completed successfully",
-    "download_failed": "Failed to download audio"
+    "download_failed": "Failed to download audio",
+    "form": {
+      "custom_mode": "Custom Mode",
+      "title": "Title",
+      "title_placeholder": "The Sound of Silence",
+      "style": "Style of Music",
+      "style_placeholder": "indie, electronic, synths, 120bpm, distorted",
+      "instrumental": "Instrumental",
+      "prompt": "Prompt",
+      "prompt_placeholder": "A country folk song about love",
+      "model": "Model",
+      "lyrics": "Lyrics",
+      "lyrics_placeholder": "Write your own lyrics, two verses (8 lines) for the best result"
+    }
   }
 }

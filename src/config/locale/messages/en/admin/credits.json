@@ -9,6 +9,7 @@
     "description": "Description",
     "created_at": "Created At",
     "expires_at": "Expires At",
+    "metadata": "Metadata",
     "action": "Action"
   },
   "list": {

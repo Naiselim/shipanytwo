@@ -11,8 +11,12 @@ export async function POST(request: Request) {
   try {
     let { provider, mediaType, model, prompt, options } = await request.json();
 
-    if (!provider || !mediaType || !model || !prompt) {
+    if (!provider || !mediaType || !model) {
       throw new Error('invalid params');
+    }
+
+    if (!prompt && !options) {
+      throw new Error('prompt or options is required');
     }
 
     const aiService = await getAIService();

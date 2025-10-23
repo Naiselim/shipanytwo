@@ -15,6 +15,7 @@ import { type TableColumn } from '@/shared/types/blocks/table';
 import { Copy } from './copy';
 import { Dropdown } from './dropdown';
 import { Image } from './image';
+import { JsonPreview } from './json-preview';
 import { Label } from './label';
 import { Time } from './time';
 import { User } from './user';
@@ -112,6 +113,15 @@ export function Table({
                   } else if (column.type === 'user') {
                     cellContent = (
                       <User
+                        placeholder={column.placeholder}
+                        value={value}
+                        metadata={column.metadata}
+                        className={column.className}
+                      />
+                    );
+                  } else if (column.type === 'json_preview') {
+                    cellContent = (
+                      <JsonPreview
                         placeholder={column.placeholder}
                         value={value}
                         metadata={column.metadata}

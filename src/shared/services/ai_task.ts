@@ -24,6 +24,11 @@ export async function createAITask(newAITask: NewAITask) {
         credits: newAITask.costCredits,
         scene: `ai-${newAITask.mediaType}-generator`,
         description: `generate ${newAITask.mediaType}`,
+        metadata: JSON.stringify({
+          type: 'ai-task',
+          mediaType: taskResult.mediaType,
+          taskId: taskResult.id,
+        }),
       });
     }
 
@@ -47,7 +52,7 @@ export async function updateAITaskById(id: string, updateAITask: UpdateAITask) {
   return result;
 }
 
-export async function getAITaskCount({
+export async function getAITasksCount({
   userId,
   status,
   mediaType,

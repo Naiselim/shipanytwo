@@ -16,7 +16,6 @@ import {
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
-import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
 import { AISong, AITaskStatus } from '@/extensions/ai';
 import { Badge } from '@/shared/components/ui/badge';
@@ -237,9 +236,49 @@ export function MusicGenerator({ className, srOnlyTitle }: SongGeneratorProps) {
   }, [taskId, isGenerating, generationStartTime]);
 
   const handleGenerate = async () => {
-    if (!prompt) {
-      toast.error('Please enter prompt');
+    if (!provider || !model) {
+      toast.error('Invalid provider or model');
       return;
+    }
+
+    if (customMode) {
+      if (!title || !style) {
+        toast.error('Please enter title and style');
+        return;
+      }
+      if (!instrumental && !lyrics) {
+        toast.error('Please enter lyrics');
+        return;
+      }
+    } else {
+      if (!prompt) {
+        toast.error('Please enter prompt');
+        return;
+      }
+    }
+
+    const params: any = {
+      mediaType: 'music',
+      provider: provider,
+      model: model,
+    };
+
+    if (customMode) {
+      params.options = {
+        customMode: true,
+        style,
+        title,
+        instrumental,
+      };
+      if (!instrumental) {
+        params.options.lyrics = lyrics;
+      }
+    } else {
+      params.prompt = prompt;
+      params.options = {
+        customMode: false,
+        instrumental,
+      };
     }
 
     setIsGenerating(true);
@@ -391,51 +430,75 @@ export function MusicGenerator({ className, srOnlyTitle }: SongGeneratorProps) {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {/* Left side - Form */}
             <Card>
-              {/* <CardHeader>
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={customMode}
                       onCheckedChange={setCustomMode}
                     />
-                    <Label>Custom Mode</Label>
+                    <Label>{t('generator.form.custom_mode')}</Label>
                   </div>
-                  <Select value={model} onValueChange={setModel}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="V4_5">V4.5+</SelectItem>
-                      <SelectItem value="V4">V4</SelectItem>
-                      <SelectItem value="V3">V3</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex-1"></div>
+                  <div className="flex items-center gap-4">
+                    <Label>{t('generator.form.model')}</Label>
+                    <Select value={model} onValueChange={setModel}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="V5">Suno V5</SelectItem>
+                        <SelectItem value="V4_5PLUS">Suno V4.5+</SelectItem>
+                        <SelectItem value="V4_5">Suno V4.5</SelectItem>
+                        <SelectItem value="V4">Suno V4</SelectItem>
+                        <SelectItem value="V3_5">Suno V3.5</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </CardHeader> */}
+              </CardHeader>
               <CardContent className="space-y-6">
-                {/* <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="Enter a title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="style">Style of Music</Label>
-                  <Textarea
-                    id="style"
-                    placeholder="Enter style of music"
-                    value={style}
-                    onChange={(e) => setStyle(e.target.value)}
-                    className="min-h-24"
-                  />
-                  <div className="text-sm text-muted-foreground text-right">
-                    {style.length}/1000
+                {customMode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="title">{t('generator.form.title')}</Label>
+                    <Input
+                      id="title"
+                      placeholder={t('generator.form.title_placeholder')}
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
                   </div>
-                </div>
+                )}
+
+                {customMode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="style">{t('generator.form.style')}</Label>
+                    <Textarea
+                      id="style"
+                      placeholder={t('generator.form.style_placeholder')}
+                      value={style}
+                      onChange={(e) => setStyle(e.target.value)}
+                      className="min-h-24"
+                    />
+                    <div className="text-muted-foreground text-right text-sm">
+                      {style.length}/1000
+                    </div>
+                  </div>
+                )}
+
+                {!customMode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="prompt">{t('generator.form.prompt')}</Label>
+                    <Textarea
+                      id="prompt"
+                      placeholder={t('generator.form.prompt_placeholder')}
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="min-h-32"
+                      required
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -443,31 +506,24 @@ export function MusicGenerator({ className, srOnlyTitle }: SongGeneratorProps) {
                     checked={instrumental}
                     onCheckedChange={setInstrumental}
                   />
-                  <Label htmlFor="instrumental">Instrumental</Label>
+                  <Label htmlFor="instrumental">
+                    {t('generator.form.instrumental')}
+                  </Label>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="lyrics">Lyrics</Label>
-                  <Textarea
-                    id="lyrics"
-                    placeholder="Write your own lyrics, two verses (8 lines) for the best result"
-                    value={lyrics}
-                    onChange={(e) => setLyrics(e.target.value)}
-                    className="min-h-32"
-                  />
-                </div> */}
+                {customMode && !instrumental && (
+                  <div className="space-y-2">
+                    <Label htmlFor="lyrics">{t('generator.form.lyrics')}</Label>
+                    <Textarea
+                      id="lyrics"
+                      placeholder={t('generator.form.lyrics_placeholder')}
+                      value={lyrics}
+                      onChange={(e) => setLyrics(e.target.value)}
+                      className="min-h-32"
+                    />
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="prompt">{t('generator.prompt')}</Label>
-                  <Textarea
-                    id="prompt"
-                    placeholder={t('generator.prompt_placeholder')}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="min-h-32"
-                    required
-                  />
-                </div>
                 {!isMounted ? (
                   <Button className="w-full" size="lg" disabled>
                     <Music className="mr-2 h-4 w-4" />

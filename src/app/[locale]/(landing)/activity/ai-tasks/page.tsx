@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { AITaskStatus } from '@/extensions/ai';
 import { AudioPlayer, Empty } from '@/shared/blocks/common';
 import { TableCard } from '@/shared/blocks/table';
-import { AITask, getAITaskCount, getAITasks } from '@/shared/services/ai_task';
+import { AITask, getAITasks, getAITasksCount } from '@/shared/services/ai_task';
 import { getUserInfo } from '@/shared/services/user';
 import { Button, Tab } from '@/shared/types/blocks/common';
 import { type Table } from '@/shared/types/blocks/table';
@@ -31,7 +31,7 @@ export default async function AiTasksPage({
     limit,
   });
 
-  const total = await getAITaskCount({
+  const total = await getAITasksCount({
     userId: user.id,
     mediaType: type,
   });

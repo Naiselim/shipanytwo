@@ -318,6 +318,7 @@ export const credit = pgTable(
       .notNull(),
     deletedAt: timestamp('deleted_at'),
     consumedDetail: text('consumed_detail'), // consumed detail
+    metadata: text('metadata'), // transaction metadata
   },
   (table) => [
     // Critical composite index for credit consumption (FIFO queue)

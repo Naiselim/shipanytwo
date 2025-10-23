@@ -21,6 +21,7 @@ export interface ContextValue {
   setIsShowPaymentModal: (show: boolean) => void;
   configs: Record<string, string>;
   fetchUserCredits: () => Promise<void>;
+  fetchUserInfo: () => Promise<void>;
 }
 
 const AppContext = createContext({} as ContextValue);
@@ -87,13 +88,33 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const fetchUserInfo = async function () {
+    try {
+      const resp = await fetch('/api/user/get-user-info', {
+        method: 'POST',
+      });
+      if (!resp.ok) {
+        throw new Error(`fetch failed with status: ${resp.status}`);
+      }
+      const { code, message, data } = await resp.json();
+      if (code !== 0) {
+        throw new Error(message);
+      }
+
+      setUser(data);
+    } catch (e) {
+      console.log('fetch user info failed:', e);
+    }
+  };
+
   useEffect(() => {
     fetchConfigs();
   }, []);
 
   useEffect(() => {
     if (session && session.user) {
-      setUser(session.user as User);
+      // setUser(session.user as User);
+      fetchUserInfo();
     } else {
       setUser(null);
     }
@@ -101,7 +122,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user && !user.credits) {
-      fetchUserCredits();
+      // fetchUserCredits();
     }
   }, [user]);
 
@@ -120,6 +141,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         setIsShowPaymentModal,
         configs,
         fetchUserCredits,
+        fetchUserInfo,
       }}
     >
       {children}

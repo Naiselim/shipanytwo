@@ -9,6 +9,7 @@
     "description": "描述",
     "created_at": "创建时间",
     "expires_at": "过期时间",
+    "metadata": "元数据",
     "action": "操作"
   },
   "list": {

@@ -2,19 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
-import {
-  Coins,
-  CreditCard,
-  ExternalLinkIcon,
-  Loader2,
-  LogOut,
-  User,
-} from 'lucide-react';
+import { Coins, LayoutDashboard, Loader2, LogOut, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { signOut } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
-import { envConfigs } from '@/config';
 import {
   Avatar,
   AvatarFallback,
@@ -25,7 +17,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
@@ -97,7 +88,9 @@ export function SignUser({
                     href="/settings/credits"
                   >
                     <Coins />
-                    {user.credits?.remainingCredits || 0}
+                    {t('credits_title', {
+                      credits: user.credits?.remainingCredits || 0,
+                    })}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -124,6 +117,18 @@ export function SignUser({
                 <DropdownMenuSeparator />
               </Fragment>
             ))}
+
+            {user.isAdmin && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link className="w-full cursor-pointer" href="/admin">
+                    <LayoutDashboard />
+                    {t('admin_title')}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
 
             {userNav?.show_sign_out && (
               <DropdownMenuItem

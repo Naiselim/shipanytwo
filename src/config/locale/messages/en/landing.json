@@ -537,14 +537,14 @@
       "items": [
         {
           "title": "X",
-          "icon": "Twitter",
+          "icon": "RiTwitterXFill",
           "url": "https://x.com/shipanyai",
           "target": "_blank"
         },
         {
           "title": "Github",
           "icon": "Github",
-          "url": "https://github.com/shipanyai",
+          "url": "https://github.com/shipanyai/shipany-template-two",
           "target": "_blank"
         },
         {
@@ -556,7 +556,7 @@
         {
           "title": "Email",
           "icon": "Mail",
-          "url": "mailto:support@shipany.codes",
+          "url": "mailto:support@xxx.ai",
           "target": "_self"
         }
       ]

@@ -55,6 +55,11 @@ export const PERMISSIONS = {
   PERMISSIONS_READ: 'admin.permissions.read',
   PERMISSIONS_WRITE: 'admin.permissions.write',
   PERMISSIONS_DELETE: 'admin.permissions.delete',
+
+  // AI Tasks
+  AITASKS_READ: 'admin.ai-tasks.read',
+  AITASKS_WRITE: 'admin.ai-tasks.write',
+  AITASKS_DELETE: 'admin.ai-tasks.delete',
 } as const;
 
 /**

@@ -1,6 +1,10 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { PERMISSIONS, requirePermission } from '@/core/rbac';
+import {
+  PERMISSIONS,
+  requireAllPermissions,
+  requirePermission,
+} from '@/core/rbac';
 import { Empty } from '@/shared/blocks/common';
 import { Header, Main, MainHeader } from '@/shared/blocks/dashboard';
 import { FormCard } from '@/shared/blocks/form';
@@ -22,8 +26,8 @@ export default async function UserEditRolesPage({
   setRequestLocale(locale);
 
   // Check if user has permission to edit posts
-  await requirePermission({
-    code: PERMISSIONS.USERS_WRITE,
+  await requireAllPermissions({
+    codes: [PERMISSIONS.USERS_WRITE, PERMISSIONS.ROLES_WRITE],
     redirectUrl: '/admin/no-permission',
     locale,
   });

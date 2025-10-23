@@ -45,7 +45,25 @@ export function Nav({ nav, className }: { nav: NavType; className?: string }) {
               className="group/collapsible"
             >
               <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+                {item?.children ? (
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip={item?.title}
+                      className={`${
+                        item?.is_active ||
+                        (mounted &&
+                          item?.url &&
+                          pathname.startsWith(item?.url as string))
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear'
+                          : ''
+                      }`}
+                    >
+                      {item?.icon && <SmartIcon name={item.icon as string} />}
+                      <span>{item?.title || ''}</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                ) : (
                   <SidebarMenuButton
                     asChild
                     tooltip={item?.title}
@@ -64,12 +82,9 @@ export function Nav({ nav, className }: { nav: NavType; className?: string }) {
                     >
                       {item?.icon && <SmartIcon name={item.icon as string} />}
                       <span>{item?.title || ''}</span>
-                      {item?.children && (
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      )}
                     </Link>
                   </SidebarMenuButton>
-                </CollapsibleTrigger>
+                )}
                 {item?.children && (
                   <CollapsibleContent>
                     <SidebarMenuSub>
@@ -91,6 +106,9 @@ export function Nav({ nav, className }: { nav: NavType; className?: string }) {
                               href={subItem.url as string}
                               target={subItem.target as string}
                             >
+                              {/* {subItem.icon && (
+                                <SmartIcon name={subItem.icon as string} />
+                              )} */}
                               <span className="px-2">{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>

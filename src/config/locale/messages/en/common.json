@@ -26,7 +26,9 @@
     "sign_out_title": "Sign Out",
     "billing_title": "Billing",
     "name_title": "Name",
-    "name_placeholder": "Input your name here"
+    "name_placeholder": "Input your name here",
+    "admin_title": "Admin System",
+    "credits_title": "Credits: {credits}"
   },
   "payment": {
     "choose_payment_method": "Choose Payment Method",
