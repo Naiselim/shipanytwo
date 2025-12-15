@@ -57,6 +57,7 @@ export class GeminiProvider implements AIProvider {
 
     console.log('[GeminiProvider] Using API key:', this.configs.apiKey);
     console.log('[GeminiProvider] API URL:', apiUrl);
+    console.log('[GeminiProvider] Request time:', new Date().toISOString());
 
     const requestParts: any[] = [
       {
@@ -133,7 +134,11 @@ export class GeminiProvider implements AIProvider {
 
     let resp;
     try {
+      console.log('[Gemini] Starting API request...');
+      const startTime = Date.now();
       resp = await fetch(apiUrl, fetchOptions);
+      const duration = Date.now() - startTime;
+      console.log('[Gemini] API request completed in', duration, 'ms');
     } catch (fetchError: any) {
       console.error('[Gemini] Fetch error:', fetchError);
       throw new Error(
@@ -144,14 +149,17 @@ export class GeminiProvider implements AIProvider {
     if (!resp.ok) {
       const errorText = await resp.text();
       console.error('[Gemini] API error response:', errorText);
+      console.error('[Gemini] Status:', resp.status, resp.statusText);
       throw new Error(
-        `request failed with status: ${resp.status}, body: ${errorText}`
+        `Gemini API request failed (${resp.status}): ${errorText}`
       );
     }
 
     const data = await resp.json();
+    console.log('[Gemini] Response parsed successfully');
 
     if (!data.candidates || data.candidates.length === 0) {
+      console.error('[Gemini] No candidates in response:', JSON.stringify(data));
       throw new Error('no candidates returned');
     }
 
@@ -172,10 +180,16 @@ export class GeminiProvider implements AIProvider {
     const mimeType = imagePart.inlineData.mimeType;
     const base64Data = imagePart.inlineData.data;
 
+    console.log('[GeminiProvider] Image data received');
+    console.log('[GeminiProvider] MIME type:', mimeType);
+    console.log('[GeminiProvider] Base64 data length:', base64Data.length);
+
     // Store image as base64 data URL instead of uploading to storage
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
-    console.log('[GeminiProvider] Image generated, storing as data URL (length:', dataUrl.length, ')');
+    console.log('[GeminiProvider] Image generated, storing as data URL');
+    console.log('[GeminiProvider] Data URL length:', dataUrl.length, 'characters');
+    console.log('[GeminiProvider] Estimated size:', Math.round(dataUrl.length / 1024), 'KB');
 
     const image: AIImage = {
       id: nanoid(),

@@ -107,7 +107,22 @@ export function MemeGenerator({
         body: formData,
       });
 
-      const data = await response.json();
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      let data;
+
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        // Non-JSON response (likely an error page)
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error(
+          response.status === 504
+            ? 'Request timeout. The image generation took too long. Please try again with a smaller image.'
+            : `Server error (${response.status}). Please try again.`
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to generate meme');

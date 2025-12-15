@@ -1,6 +1,3 @@
-import { nanoid } from 'nanoid';
-
-import { envConfigs } from '@/config';
 import { AIMediaType } from '@/extensions/ai';
 import { getUuid } from '@/shared/lib/hash';
 import { respData, respErr } from '@/shared/lib/resp';
@@ -85,9 +82,11 @@ export async function POST(request: Request) {
     });
 
     console.log('[Meme Generation] AI generation completed');
-    console.log('[Meme Generation] Result:', JSON.stringify(result, null, 2));
+    console.log('[Meme Generation] Result status:', result.taskStatus);
+    console.log('[Meme Generation] Images count:', result.taskInfo?.images?.length);
 
     if (!result?.taskInfo?.images?.[0]) {
+      console.error('[Meme Generation] No images in result:', JSON.stringify(result, null, 2));
       throw new Error('Failed to generate meme sticker pack');
     }
 
@@ -97,7 +96,9 @@ export async function POST(request: Request) {
     if (!generatedImageUrl) {
       throw new Error('No image URL returned from AI provider');
     }
-    console.log('[Meme Generation] Generated image URL:', generatedImageUrl);
+    console.log('[Meme Generation] Generated image URL type:', generatedImageUrl.startsWith('data:') ? 'data URL' : 'external URL');
+    console.log('[Meme Generation] Image URL length:', generatedImageUrl.length);
+    console.log('[Meme Generation] Image URL preview:', generatedImageUrl.substring(0, 100) + '...');
 
     // Consume credits
     console.log('[Meme Generation] Consuming credits...');
@@ -115,6 +116,7 @@ export async function POST(request: Request) {
     console.log('[Meme Generation] Credits consumed successfully');
 
     // Save meme to database
+    console.log('[Meme Generation] Preparing to save meme to database...');
     const newMeme: NewMeme = {
       id: getUuid(),
       userId: user.id,
@@ -126,8 +128,11 @@ export async function POST(request: Request) {
       costCredits: MEME_GENERATION_COST,
     };
 
+    console.log('[Meme Generation] Saving meme record (image data length:', generatedImageUrl.length, ')...');
+    const dbStartTime = Date.now();
     const memeRecord = await createMeme(newMeme);
-    console.log('[Meme Generation] Meme saved to database:', memeRecord.id);
+    const dbDuration = Date.now() - dbStartTime;
+    console.log('[Meme Generation] Meme saved to database in', dbDuration, 'ms, ID:', memeRecord.id);
 
     return respData({
       id: memeRecord.id,
@@ -137,6 +142,8 @@ export async function POST(request: Request) {
     });
   } catch (e: any) {
     console.error('[Meme Generation] Error:', e);
+    console.error('[Meme Generation] Error name:', e.name);
+    console.error('[Meme Generation] Error message:', e.message);
     console.error('[Meme Generation] Stack:', e.stack);
     return respErr(e.message || 'Failed to generate meme');
   }
