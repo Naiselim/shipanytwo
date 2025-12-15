@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 
 import { MemeGeneratorBlock } from '@/shared/blocks/meme-generator';
+import { MemeGalleryBlock } from '@/shared/blocks/meme-gallery';
 import { PageHeader } from '@/shared/blocks/common';
 
 export default async function LandingPage({
@@ -19,6 +20,9 @@ export default async function LandingPage({
         className="mt-16 -mb-32"
       />
       <MemeGeneratorBlock />
+
+      {/* User's Meme Collection */}
+      <MemeGalleryBlock />
 
       <section className="container py-20">
         <div className="mx-auto max-w-4xl text-center">
