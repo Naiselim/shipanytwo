@@ -185,7 +185,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         isShowPaymentModal,
         setIsShowPaymentModal,
         configs,
-        credits: user?.credits,
+        credits: user?.credits?.remainingCredits,
         refreshCredits: fetchUserCredits,
         fetchUserCredits,
         fetchUserInfo,
