@@ -1,4 +1,5 @@
 import { AIMediaType } from '@/extensions/ai';
+import { envConfigs } from '@/config';
 import { getUuid } from '@/shared/lib/hash';
 import { respData, respErr } from '@/shared/lib/resp';
 import { createMeme, NewMeme } from '@/shared/models/meme';
@@ -58,9 +59,9 @@ export async function POST(request: Request) {
     const base64 = Buffer.from(buffer).toString('base64');
     console.log('[Meme Generation] Image converted to base64');
 
-    // Generate meme using Gemini
-    const prompt =
-      'A dense sticker collage featuring multiple different versions of the character shown in the reference image. The character should be depicted in a cute, chibi-style cartoon, including dozens of different emojis showcasing a variety of emotions: happiness, extreme sadness, shock, sleeping, eating, and giving a thumbs-up. Please maintain the main body features and colors of the character from the reference image. The overall image aspect ratio should be 16:9. I will be post-processing this image, so I would like the emoji pack to have 4 rows, with 4 emojis in each row, evenly distributed both horizontally and vertically, to facilitate easy cropping of each emoji later.';
+    // Get prompt from environment variable
+    const prompt = envConfigs.meme_generation_prompt;
+    console.log('[Meme Generation] Using prompt (length:', prompt.length, 'chars)');
 
     console.log('[Meme Generation] Calling AI provider...');
     const result = await aiProvider.generate({

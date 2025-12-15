@@ -33,6 +33,10 @@ export const envConfigs = {
   gemini_api_key: process.env.GEMINI_API_KEY ?? '',
   kie_api_key: process.env.KIE_API_KEY ?? '',
   replicate_api_token: process.env.REPLICATE_API_TOKEN ?? '',
+  // Meme Generation
+  meme_generation_prompt:
+    process.env.MEME_GENERATION_PROMPT ??
+    'A dense sticker collage featuring multiple different versions of the character shown in the reference image. The character should be depicted in a cute, chibi-style cartoon, including dozens of different emojis showcasing a variety of emotions: happiness, extreme sadness, shock, sleeping, eating, and giving a thumbs-up. Please maintain the main body features and colors of the character from the reference image. The overall image aspect ratio should be 16:9. I will be post-processing this image, so I would like the emoji pack to have 4 rows, with 4 emojis in each row, evenly distributed both horizontally and vertically, to facilitate easy cropping of each emoji later.',
   // Storage - R2
   r2_access_key: process.env.R2_ACCESS_KEY ?? '',
   r2_secret_key: process.env.R2_SECRET_KEY ?? '',
