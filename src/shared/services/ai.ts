@@ -24,11 +24,14 @@ export function getAIManagerWithConfigs(configs: Configs) {
   }
 
   if (configs.gemini_api_key) {
+    console.log('[AI Service] Initializing Gemini provider with API key:', configs.gemini_api_key);
     aiManager.addProvider(
       new GeminiProvider({
         apiKey: configs.gemini_api_key,
       })
     );
+  } else {
+    console.log('[AI Service] No Gemini API key found in configs');
   }
 
   return aiManager;

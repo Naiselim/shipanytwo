@@ -30,6 +30,7 @@ export class GeminiProvider implements AIProvider {
   // init provider
   constructor(configs: GeminiConfigs) {
     this.configs = configs;
+    console.log('[GeminiProvider] Initialized with API key:', configs.apiKey);
   }
 
   // generate task
@@ -53,6 +54,9 @@ export class GeminiProvider implements AIProvider {
     }
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.configs.apiKey}`;
+
+    console.log('[GeminiProvider] Using API key:', this.configs.apiKey);
+    console.log('[GeminiProvider] API URL:', apiUrl);
 
     const requestParts: any[] = [
       {

@@ -79,6 +79,7 @@ export async function getAllConfigs(): Promise<Configs> {
   if (envConfigs.database_url) {
     try {
       dbConfigs = await getConfigs();
+      console.log('[getAllConfigs] DB configs loaded:', Object.keys(dbConfigs).length, 'keys');
     } catch (e) {
       console.log(`get configs from db failed:`, e);
       dbConfigs = {};
@@ -89,6 +90,10 @@ export async function getAllConfigs(): Promise<Configs> {
     ...envConfigs,
     ...dbConfigs,
   };
+
+  console.log('[getAllConfigs] Final gemini_api_key:', configs.gemini_api_key ? `${configs.gemini_api_key.substring(0, 10)}...` : 'NOT SET');
+  console.log('[getAllConfigs] Source - envConfigs.gemini_api_key:', envConfigs.gemini_api_key ? `${envConfigs.gemini_api_key.substring(0, 10)}...` : 'NOT SET');
+  console.log('[getAllConfigs] Source - dbConfigs.gemini_api_key:', dbConfigs.gemini_api_key ? `${dbConfigs.gemini_api_key.substring(0, 10)}...` : 'NOT SET');
 
   return configs;
 }
