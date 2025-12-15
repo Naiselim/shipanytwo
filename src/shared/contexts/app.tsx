@@ -22,6 +22,8 @@ export interface ContextValue {
   isShowPaymentModal: boolean;
   setIsShowPaymentModal: (show: boolean) => void;
   configs: Record<string, string>;
+  credits?: number;
+  refreshCredits?: () => void;
   fetchUserCredits: () => Promise<void>;
   fetchUserInfo: () => Promise<void>;
 }
@@ -85,7 +87,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(message);
       }
 
-      setUser({ ...user, credits: data });
+      setUser({ ...user, credits: data.remainingCredits });
     } catch (e) {
       console.log('fetch user credits failed:', e);
     }
@@ -165,7 +167,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user && !user.credits) {
-      // fetchUserCredits();
+      fetchUserCredits();
     }
   }, [user]);
 
@@ -183,6 +185,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         isShowPaymentModal,
         setIsShowPaymentModal,
         configs,
+        credits: user?.credits,
+        refreshCredits: fetchUserCredits,
         fetchUserCredits,
         fetchUserInfo,
       }}

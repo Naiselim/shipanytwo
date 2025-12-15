@@ -2,65 +2,15 @@
   "header": {
     "id": "header",
     "brand": {
-      "title": "ShipAny Two",
+      "title": "表情包生成器",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny Two"
+        "alt": "表情包生成器"
       },
       "url": "/"
     },
     "nav": {
-      "items": [
-        {
-          "title": "功能亮点",
-          "url": "/#features",
-          "icon": "Sparkles"
-        },
-        {
-          "title": "案例展示",
-          "url": "/showcases",
-          "icon": "Box"
-        },
-        {
-          "title": "价格",
-          "url": "/pricing",
-          "icon": "DollarSign"
-        },
-        {
-          "title": "AI",
-          "icon": "RiRobot2Line",
-          "children": [
-            {
-              "title": "AI 图片生成器",
-              "description": "使用 AI 生成图片",
-              "url": "/ai-image-generator",
-              "icon": "RiImage2Line"
-            },
-            {
-              "title": "AI 音乐生成器",
-              "description": "使用 AI 生成美妙的音乐",
-              "url": "/ai-music-generator",
-              "icon": "RiMusic2Line"
-            },
-            {
-              "title": "AI 聊天机器人",
-              "description": "与 AI 聊天机器人对话",
-              "url": "/chat",
-              "icon": "RiMessage2Line"
-            }
-          ]
-        },
-        {
-          "title": "博客",
-          "url": "/blog",
-          "icon": "Newspaper"
-        },
-        {
-          "title": "文档",
-          "url": "/docs",
-          "icon": "BookOpenText"
-        }
-      ]
+      "items": []
     },
     "buttons": [],
     "user_nav": {
@@ -72,17 +22,12 @@
           "title": "账单",
           "url": "/settings/billing",
           "icon": "CreditCard"
-        },
-        {
-          "title": "活动",
-          "url": "/activity",
-          "icon": "Activity"
         }
       ]
     },
     "show_sign": true,
     "show_theme": true,
-    "show_locale": true
+    "show_locale": false
   },
   "hero": {
     "id": "hero",

@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 import {
   AIConfigs,
@@ -59,26 +60,34 @@ export class GeminiProvider implements AIProvider {
       },
     ];
 
+    // Handle image_input - can be either URL strings or inlineData objects
     if (options && options.image_input && Array.isArray(options.image_input)) {
-      for (const imageUrl of options.image_input) {
+      for (const imageInput of options.image_input) {
         try {
-          const imageResp = await fetch(imageUrl);
-          if (imageResp.ok) {
-            const arrayBuffer = await imageResp.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const base64Image = buffer.toString('base64');
-            const mimeType =
-              imageResp.headers.get('content-type') || 'image/jpeg';
+          // If it's already an inlineData object, use it directly
+          if (typeof imageInput === 'object' && imageInput.inlineData) {
+            requestParts.push(imageInput);
+          }
+          // If it's a URL string, fetch and convert to base64
+          else if (typeof imageInput === 'string') {
+            const imageResp = await fetch(imageInput);
+            if (imageResp.ok) {
+              const arrayBuffer = await imageResp.arrayBuffer();
+              const buffer = Buffer.from(arrayBuffer);
+              const base64Image = buffer.toString('base64');
+              const mimeType =
+                imageResp.headers.get('content-type') || 'image/jpeg';
 
-            requestParts.push({
-              inlineData: {
-                mimeType,
-                data: base64Image,
-              },
-            });
+              requestParts.push({
+                inlineData: {
+                  mimeType,
+                  data: base64Image,
+                },
+              });
+            }
           }
         } catch (e) {
-          console.error('failed to fetch image input', imageUrl, e);
+          console.error('failed to process image input', imageInput, e);
         }
       }
     }
@@ -90,22 +99,47 @@ export class GeminiProvider implements AIProvider {
         role: 'user',
         parts: requestParts,
       },
-      generation_config: {
-        response_modalities: ['TEXT', 'IMAGE'],
+      generationConfig: {
+        responseModalities: ['TEXT', 'IMAGE'],
         ...generationConfig,
       },
     };
 
-    const resp = await fetch(apiUrl, {
+    console.log('[Gemini] API URL:', apiUrl);
+    console.log('[Gemini] Request payload:', JSON.stringify(payload, null, 2));
+
+    // Configure proxy if available
+    const { envConfigs } = await import('@/config');
+    const proxyUrl = envConfigs.https_proxy || envConfigs.http_proxy;
+    const fetchOptions: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    });
+    };
+
+    // Add proxy agent if proxy is configured
+    if (proxyUrl) {
+      console.log('[Gemini] Using proxy:', proxyUrl);
+      const proxyAgent = new HttpsProxyAgent(proxyUrl);
+      // @ts-ignore - undici fetch accepts agent option
+      fetchOptions.dispatcher = proxyAgent;
+    }
+
+    let resp;
+    try {
+      resp = await fetch(apiUrl, fetchOptions);
+    } catch (fetchError: any) {
+      console.error('[Gemini] Fetch error:', fetchError);
+      throw new Error(
+        `Failed to connect to Gemini API: ${fetchError.message}. Please check your network connection and API key.${proxyUrl ? ' Proxy: ' + proxyUrl : ''}`
+      );
+    }
 
     if (!resp.ok) {
       const errorText = await resp.text();
+      console.error('[Gemini] API error response:', errorText);
       throw new Error(
         `request failed with status: ${resp.status}, body: ${errorText}`
       );

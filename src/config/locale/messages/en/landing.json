@@ -2,65 +2,15 @@
   "header": {
     "id": "header",
     "brand": {
-      "title": "ShipAny Two",
+      "title": "Meme Generator",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny Two"
+        "alt": "Meme Generator"
       },
       "url": "/"
     },
     "nav": {
-      "items": [
-        {
-          "title": "Features",
-          "url": "/#features",
-          "icon": "Sparkles"
-        },
-        {
-          "title": "Showcases",
-          "url": "/showcases",
-          "icon": "Box"
-        },
-        {
-          "title": "Pricing",
-          "url": "/pricing",
-          "icon": "DollarSign"
-        },
-        {
-          "title": "AI",
-          "icon": "RiRobot2Line",
-          "children": [
-            {
-              "title": "AI Image Generator",
-              "description": "Use AI to generate images",
-              "url": "/ai-image-generator",
-              "icon": "RiImage2Line"
-            },
-            {
-              "title": "AI Music Generator",
-              "description": "Use AI to generate music",
-              "url": "/ai-music-generator",
-              "icon": "RiMusic2Line"
-            },
-            {
-              "title": "AI Chatbot",
-              "description": "Chat with AI chatbot",
-              "url": "/chat",
-              "icon": "RiMessage2Line"
-            }
-          ]
-        },
-        {
-          "title": "Blog",
-          "url": "/blog",
-          "icon": "Newspaper"
-        },
-        {
-          "title": "Docs",
-          "url": "/docs",
-          "icon": "BookOpenText"
-        }
-      ]
+      "items": []
     },
     "buttons": [],
     "user_nav": {
@@ -72,17 +22,12 @@
           "title": "Billing",
           "url": "/settings/billing",
           "icon": "CreditCard"
-        },
-        {
-          "title": "Activity",
-          "url": "/activity",
-          "icon": "Activity"
         }
       ]
     },
     "show_sign": true,
     "show_theme": true,
-    "show_locale": true
+    "show_locale": false
   },
   "hero": {
     "id": "hero",

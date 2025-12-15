@@ -539,3 +539,30 @@ export const chatMessage = pgTable(
     index('idx_chat_message_user_id').on(table.userId, table.status),
   ]
 );
+
+export const meme = pgTable(
+  'meme',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    imageUrl: text('image_url').notNull(), // R2/S3 URL
+    prompt: text('prompt'),
+    provider: text('provider').default('gemini').notNull(),
+    model: text('model').default('gemini-3-pro-image-preview').notNull(),
+    status: text('status').default('completed').notNull(),
+    costCredits: integer('cost_credits').default(2).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .$onUpdate(() => new Date())
+      .notNull(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    // Query user's memes by creation time
+    index('idx_meme_user_created').on(table.userId, table.createdAt),
+    // Query memes by status
+    index('idx_meme_status').on(table.status),
+  ]
+);
