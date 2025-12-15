@@ -32,7 +32,7 @@ async function grantCreditsToAllUsers() {
     const creditsArg = args.find((arg) => arg.startsWith('--credits='));
     const creditsAmount = creditsArg
       ? parseInt(creditsArg.split('=')[1], 10)
-      : envConfigs.initial_credits;
+      : parseInt(envConfigs.initial_credits, 10);
 
     console.log(`💰 Credits amount: ${creditsAmount}\n`);
 

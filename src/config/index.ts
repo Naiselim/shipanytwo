@@ -29,7 +29,7 @@ export const envConfigs = {
   db_max_connections: process.env.DB_MAX_CONNECTIONS || '1',
   auth_url: process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || '',
   auth_secret: process.env.AUTH_SECRET ?? '', // openssl rand -base64 32
-  initial_credits: parseInt(process.env.INITIAL_CREDITS ?? '50', 10),
+  initial_credits: process.env.INITIAL_CREDITS ?? '50',
   gemini_api_key: process.env.GEMINI_API_KEY ?? '',
   kie_api_key: process.env.KIE_API_KEY ?? '',
   replicate_api_token: process.env.REPLICATE_API_TOKEN ?? '',

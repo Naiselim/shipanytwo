@@ -25,7 +25,7 @@ async function enableInitialCredits() {
       },
       {
         name: 'initial_credits_amount',
-        value: envConfigs.initial_credits.toString(),
+        value: envConfigs.initial_credits,
         description: 'Amount of initial credits to grant to new users',
       },
       {
