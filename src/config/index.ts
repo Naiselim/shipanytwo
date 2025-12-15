@@ -33,6 +33,21 @@ export const envConfigs = {
   gemini_api_key: process.env.GEMINI_API_KEY ?? '',
   kie_api_key: process.env.KIE_API_KEY ?? '',
   replicate_api_token: process.env.REPLICATE_API_TOKEN ?? '',
+  // Storage - R2
+  r2_access_key: process.env.R2_ACCESS_KEY ?? '',
+  r2_secret_key: process.env.R2_SECRET_KEY ?? '',
+  r2_bucket_name: process.env.R2_BUCKET_NAME ?? '',
+  r2_account_id: process.env.R2_ACCOUNT_ID ?? '',
+  r2_domain: process.env.R2_DOMAIN ?? '',
+  r2_endpoint: process.env.R2_ENDPOINT ?? '',
+  // Storage - S3
+  s3_access_key: process.env.S3_ACCESS_KEY ?? '',
+  s3_secret_key: process.env.S3_SECRET_KEY ?? '',
+  s3_bucket: process.env.S3_BUCKET ?? '',
+  s3_region: process.env.S3_REGION ?? '',
+  s3_endpoint: process.env.S3_ENDPOINT ?? '',
+  s3_domain: process.env.S3_DOMAIN ?? '',
+  // Proxy
   http_proxy: process.env.HTTP_PROXY ?? process.env.http_proxy ?? '',
   https_proxy: process.env.HTTPS_PROXY ?? process.env.https_proxy ?? '',
 };

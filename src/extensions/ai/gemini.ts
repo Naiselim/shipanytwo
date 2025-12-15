@@ -172,43 +172,16 @@ export class GeminiProvider implements AIProvider {
     const mimeType = imagePart.inlineData.mimeType;
     const base64Data = imagePart.inlineData.data;
 
-    // upload to storage
-    const { getStorageService } = await import('@/shared/services/storage');
-    const storageService = await getStorageService();
-    const buffer = Buffer.from(base64Data, 'base64');
-    const ext = mimeType.split('/')[1] || 'png';
-    const filename = `${nanoid()}.${ext}`;
-    const key = `ai/gemini/${filename}`;
+    // Store image as base64 data URL instead of uploading to storage
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
-    const uploadResult = await storageService.uploadFile({
-      body: buffer,
-      key,
-      contentType: mimeType,
-    });
-
-    if (!uploadResult || !uploadResult.url) {
-      throw new Error('upload image failed');
-    }
-
-    // replace base64 data with url to save db space
-    if (imagePart.inlineData) {
-      imagePart.inlineData.data = uploadResult.url;
-      // Ensure the original data object is updated
-      const partIndex = parts.findIndex((p: any) => p === imagePart);
-      if (partIndex !== -1 && data.candidates?.[0]?.content?.parts) {
-        // unset image base64 data
-        data.candidates[0].content.parts[partIndex].inlineData.data =
-          uploadResult.url;
-        // unset thoughtSignature
-        data.candidates[0].content.parts[partIndex].thoughtSignature = ''
-      }
-    }
+    console.log('[GeminiProvider] Image generated, storing as data URL (length:', dataUrl.length, ')');
 
     const image: AIImage = {
       id: nanoid(),
       createTime: new Date(),
       imageType: mimeType,
-      imageUrl: uploadResult.url,
+      imageUrl: dataUrl,
     };
 
     return {

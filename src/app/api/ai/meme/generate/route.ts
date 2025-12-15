@@ -8,7 +8,6 @@ import { createMeme, NewMeme } from '@/shared/models/meme';
 import { getRemainingCredits } from '@/shared/models/credit';
 import { getUserInfo } from '@/shared/models/user';
 import { getAIService } from '@/shared/services/ai';
-import { getStorageService } from '@/shared/services/storage';
 import { consumeCredits } from '@/shared/models/credit';
 
 const MEME_GENERATION_COST = 2;
