@@ -7,6 +7,7 @@ import { getRemainingCredits } from '@/shared/models/credit';
 import { getUserInfo } from '@/shared/models/user';
 import { getAIService } from '@/shared/services/ai';
 import { consumeCredits } from '@/shared/models/credit';
+import { splitImage } from '@/shared/lib/image-split';
 
 const MEME_GENERATION_COST = 2;
 
@@ -61,7 +62,11 @@ export async function POST(request: Request) {
 
     // Get prompt from environment variable
     const prompt = envConfigs.meme_generation_prompt;
+    const aspectRatio = envConfigs.meme_generation_aspect_ratio;
+    const imageSize = envConfigs.meme_generation_image_size;
+
     console.log('[Meme Generation] Using prompt (length:', prompt.length, 'chars)');
+    console.log('[Meme Generation] Image config:', { aspectRatio, imageSize });
 
     console.log('[Meme Generation] Calling AI provider...');
     const result = await aiProvider.generate({
@@ -70,6 +75,8 @@ export async function POST(request: Request) {
         model: 'gemini-3-pro-image-preview',
         prompt,
         options: {
+          aspectRatio,
+          imageSize,
           image_input: [
             {
               inlineData: {
@@ -101,6 +108,26 @@ export async function POST(request: Request) {
     console.log('[Meme Generation] Image URL length:', generatedImageUrl.length);
     console.log('[Meme Generation] Image URL preview:', generatedImageUrl.substring(0, 100) + '...');
 
+    // Split the image into 4x4 grid
+    console.log('[Meme Generation] Splitting image into 4x4 grid...');
+    const splitStartTime = Date.now();
+
+    // Extract base64 data and mime type from data URL
+    const dataUrlMatch = generatedImageUrl.match(/^data:(.+);base64,(.+)$/);
+    if (!dataUrlMatch) {
+      throw new Error('Invalid data URL format');
+    }
+
+    const mimeType = dataUrlMatch[1];
+    const base64Data = dataUrlMatch[2];
+
+    const splitResult = await splitImage(base64Data, mimeType, 4, 4);
+    const splitDuration = Date.now() - splitStartTime;
+
+    console.log('[Meme Generation] Image split completed in', splitDuration, 'ms');
+    console.log('[Meme Generation] Generated', splitResult.images.length, 'individual emojis');
+    console.log('[Meme Generation] Total size of split images:', Math.round(splitResult.images.reduce((acc, img) => acc + img.dataUrl.length, 0) / 1024 / 1024), 'MB');
+
     // Consume credits
     console.log('[Meme Generation] Consuming credits...');
     await consumeCredits({
@@ -122,6 +149,7 @@ export async function POST(request: Request) {
       id: getUuid(),
       userId: user.id,
       imageUrl: generatedImageUrl,
+      splitImages: JSON.stringify(splitResult.images),
       prompt,
       provider,
       model: 'gemini-3-pro-image-preview',
@@ -129,7 +157,10 @@ export async function POST(request: Request) {
       costCredits: MEME_GENERATION_COST,
     };
 
-    console.log('[Meme Generation] Saving meme record (image data length:', generatedImageUrl.length, ')...');
+    console.log('[Meme Generation] Saving meme record...');
+    console.log('[Meme Generation] - Original image size:', Math.round(generatedImageUrl.length / 1024), 'KB');
+    console.log('[Meme Generation] - Split images size:', Math.round(JSON.stringify(splitResult.images).length / 1024), 'KB');
+    console.log('[Meme Generation] - Total data size:', Math.round((generatedImageUrl.length + JSON.stringify(splitResult.images).length) / 1024), 'KB');
     const dbStartTime = Date.now();
     const memeRecord = await createMeme(newMeme);
     const dbDuration = Date.now() - dbStartTime;

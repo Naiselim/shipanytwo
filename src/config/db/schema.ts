@@ -547,7 +547,8 @@ export const meme = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    imageUrl: text('image_url').notNull(), // base64 data URL or external URL
+    imageUrl: text('image_url').notNull(), // Original full image as base64 data URL
+    splitImages: text('split_images'), // JSON array of split images [{index, row, col, dataUrl}]
     prompt: text('prompt'),
     provider: text('provider').default('gemini').notNull(),
     model: text('model').default('gemini-3-pro-image-preview').notNull(),

@@ -97,7 +97,7 @@ export class GeminiProvider implements AIProvider {
       }
     }
 
-    const { image_input, ...generationConfig } = options || {};
+    const { image_input, aspectRatio, imageSize, ...generationConfig } = options || {};
 
     const payload = {
       contents: {
@@ -106,11 +106,16 @@ export class GeminiProvider implements AIProvider {
       },
       generationConfig: {
         responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+          aspectRatio: aspectRatio || '1:1',
+          imageSize: imageSize || '1K',
+        },
         ...generationConfig,
       },
     };
 
     console.log('[Gemini] API URL:', apiUrl);
+    console.log('[Gemini] Image config:', { aspectRatio: aspectRatio || '1:1', imageSize: imageSize || '1K' });
     console.log('[Gemini] Request payload:', JSON.stringify(payload, null, 2));
 
     // Configure proxy if available
